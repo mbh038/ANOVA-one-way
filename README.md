@@ -1,2 +1,2 @@
 # ANOVA
-One-way ANOVA exercise
+One-way ANOVA exercise using palmerpenguins
