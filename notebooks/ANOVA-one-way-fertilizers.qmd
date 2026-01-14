@@ -1,0 +1,78 @@
+---
+title: "One way ANOVA - fertilizers"
+author: "your name"
+date: "the date"
+toc: true
+format: html
+editor: visual
+execute: 
+  warning: false
+  message: false
+---
+
+## Load packages
+```{r}
+library(tidyverse)
+library(here)
+library(cowplot)
+library(janitor)
+library(ggfortify)
+```
+
+## Load data
+Save it in R as a data frame called `fertilizer`
+```{r}
+fertilizer <- here("data","fertilizer.csv") |>
+  read_csv() |>
+  clean_names() |>
+  glimpse()
+```
+
+## Summarise data
+```{r}
+fertilizer_summary <- fertilizer |>
+  group_by(fertilizer) |>
+  summarise(n = n(), mean.yield = mean(yield), se.yield = sd(yield)/sqrt(n()))
+fertilizer_summary
+```
+
+## Plot data
+```{r}
+fertilizer |>
+  ggplot(aes(x = fertilizer, y = yield)) +
+  geom_boxplot(fill = "grey80") +
+  geom_jitter(width = 0.2, alpha = 0.5) +
+  labs( x = "Fertilizer",
+        y = "Yield") +
+  theme_cowplot()
+```
+
+## Do an ANOVA analysis
+```{r}
+fertilizer.model <- lm(yield ~ fertilizer, data = fertilizer)
+```
+
+```{r}
+autoplot(fertilizer.model) + theme_cowplot()
+```
+
+OK?
+
+If so...
+
+## Inspect the model: is there evidence of any difference between at leat one pair of fertilizers?
+```{r}
+anova(fertilizer.model)
+```
+## Inspect the model: effect sizes
+```{r}
+summary(fertilizer.model)
+```
+## Post-hoc test
+```{r}
+TukeyHSD(aov(yield ~ fertilizer, data = fertilizer))
+```
+
+
+So which fertilizers give significantly different yield from which others?
+Which gives the greatest yield?
